@@ -42,6 +42,7 @@ const STANDALONE_PAGES = [
   "/learn/human-research",
   "/profile",
 ];
+const BASE_PATH = process.env.ASTRA_BASE_PATH ?? "/";
 
 export default defineConfig({
   tanstackStart: {
@@ -55,5 +56,5 @@ export default defineConfig({
         }
       : {}),
   },
-  vite: { plugins: [stripTsdSourceFrom3D] },
+  vite: { base: BASE_PATH, plugins: [stripTsdSourceFrom3D] },
 });

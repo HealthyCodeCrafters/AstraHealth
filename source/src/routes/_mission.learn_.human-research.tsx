@@ -5,13 +5,13 @@ import type { ReactNode } from "react";
 import { PageHeader } from "@/components/astra/PageHeader";
 import { Button } from "@/components/ui/button";
 import research from "@/lib/astra/human-research.json";
-import { isOfflineBuild } from "@/lib/astra/local-assets";
+import { isOfflineBuild, offlineAssetUrl } from "@/lib/astra/local-assets";
 
 /** In the offline build, document images are served from the local bundle. */
 function offlineImage(src: string | undefined): string {
   if (!src || !isOfflineBuild) return src ?? "";
   const name = src.split("/").pop();
-  return name ? `/offline-assets/${name}` : src;
+  return name ? offlineAssetUrl(name) : src;
 }
 
 export const Route = createFileRoute("/_mission/learn_/human-research")({
