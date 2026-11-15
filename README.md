@@ -22,7 +22,7 @@ To use another port, set `PORT` before launching (`set PORT=9000` in Windows Com
 
 Choose **Launch Offline Demo** from the home page or open the Offline Demo Mode panel in Mission Control. The simulation includes astronaut profiles, mission environments, adjustable speed, and several scenarios. Demo readings and scenarios are simulated, and the interface marks demonstration data.
 
-The offline assistant is a local, rule-based demo, not a medical AI. Features that call online services—such as AI chat or camera assessment—require an internet connection and are not available in the offline package. Data used by the standalone offline demo is stored in this browser on this device.
+The GitHub Pages edition uses a local, rule-based demonstration assistant for Nova and Emergency chat, even when online. The prebuilt standalone edition uses the demonstration assistant when the browser is offline. The assistant is not AI and does not provide medical advice. Full AI chat and camera assessment require a separately hosted server and configured AI provider; they are not available in the static editions. Data used by the standalone offline demo is stored in this browser on this device.
 
 ## Develop and validate
 

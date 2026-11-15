@@ -8,7 +8,8 @@ import { WellbeingForm } from "@/components/astra/WellbeingForm";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { askNova } from "@/lib/astra/nova.functions";
-import { offlineAnswer } from "@/lib/astra/offline-assistant";
+import { offlineAnswer, useDemoAssistant } from "@/lib/astra/offline-assistant";
+import { isOfflineBuild } from "@/lib/astra/local-assets";
 import { actions, useAstra } from "@/lib/astra/store";
 import { dayKey } from "@/lib/astra/time";
 
@@ -54,11 +55,9 @@ function Wellbeing() {
     setText("");
     setBusy(true);
     setError("");
-    // Offline: Nova's AI needs the network, so use the local rule-based demonstration
-    // assistant instead and label it clearly.
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
+    if (useDemoAssistant()) {
       const reply = offlineAnswer(t);
-      setMsgs((m) => [...m, { role: "assistant", content: `(Offline demonstration assistant — not Nova's full AI)\n\n${reply.text}` }]);
+      setMsgs((m) => [...m, { role: "assistant", content: `(Local demonstration assistant — rule-based, not AI)\n\n${reply.text}` }]);
       if (next.filter((m) => m.role === "user").length >= 2) actions.markWellbeingTalk();
       setBusy(false);
       return;
@@ -80,6 +79,7 @@ function Wellbeing() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel kicker="AI companion" title="Nova" className="lg:col-span-2">
           <div className="flex h-[26rem] flex-col">
+            {isOfflineBuild && <p role="note" className="mb-3 text-sm text-muted-foreground">Local demonstration assistant: rule-based replies, not Nova's AI. Messages stay in this browser.</p>}
             <div className="flex-1 space-y-3 overflow-y-auto pr-1">
               {msgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "ml-auto max-w-[80%] rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground" : "flex max-w-[85%] gap-2 text-sm"}>

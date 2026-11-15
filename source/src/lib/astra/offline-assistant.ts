@@ -3,6 +3,11 @@
 // knowledge only — it is NOT a real AI and never gives medical diagnoses.
 
 import { PROTOCOLS, selectProtocol } from "./emergency-protocols";
+import { isOfflineBuild } from "./local-assets";
+
+export function useDemoAssistant(): boolean {
+  return isOfflineBuild || (typeof navigator !== "undefined" && !navigator.onLine);
+}
 
 export interface OfflineReply {
   text: string;

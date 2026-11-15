@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { AstraMark } from "./AstraLogo";
 import { EMERGENCY_HISTORY_KEY, parseEmergencyHistory } from "@/lib/astra/emergency-history";
 import { PROTOCOLS, selectProtocol } from "@/lib/astra/emergency-protocols";
-import { offlineAnswer } from "@/lib/astra/offline-assistant";
+import { offlineAnswer, useDemoAssistant } from "@/lib/astra/offline-assistant";
+import { isOfflineBuild } from "@/lib/astra/local-assets";
 import { useAstra } from "@/lib/astra/store";
 
 const transport = new DefaultChatTransport({ api: "/api/emergency-chat" });
@@ -56,15 +57,13 @@ function ChatSession({ initial, storageError, onUserContextChange }: { initial: 
     if (busy || !value.trim()) return;
     clearError(); setText("");
     const trimmed = value.trim();
-    // Offline: the AI gateway is unreachable, so answer from the local rule-based
-    // demonstration assistant instead of sending anything to the network.
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
+    if (useDemoAssistant()) {
       const reply = offlineAnswer(trimmed);
       const stamp = Date.now();
       setMessages([
         ...messages,
         { id: `u_${stamp}`, role: "user", parts: [{ type: "text", text: trimmed }] },
-        { id: `a_${stamp}`, role: "assistant", parts: [{ type: "text", text: `*(Offline demonstration assistant — not the full AI)*\n\n${reply.text}` }] },
+        { id: `a_${stamp}`, role: "assistant", parts: [{ type: "text", text: `*(Local demonstration assistant — rule-based, not AI)*\n\n${reply.text}` }] },
       ]);
       textarea.current?.focus();
       return;
@@ -107,7 +106,7 @@ function ChatSession({ initial, storageError, onUserContextChange }: { initial: 
         <PromptInputTextarea ref={textarea} aria-label="Describe the emergency" placeholder="Describe symptoms, when they started, and breathing…" value={text} onChange={(e) => setText(e.target.value)} maxLength={4000} autoFocus />
         <PromptInputFooter className="justify-end"><PromptInputSubmit status={status} onStop={stop} disabled={!busy && !text.trim()} /></PromptInputFooter>
       </PromptInput>
-      <p className="text-xs text-muted-foreground">Messages are sent to Lovable AI for replies. History stays in this browser and may be visible to anyone using this device. Avoid names, phone numbers and identifying medical details.</p>
+      <p className="text-xs text-muted-foreground">{isOfflineBuild ? "This local demonstration assistant uses rules, not AI. Messages are not sent to an AI service." : "Messages are sent to Lovable AI for replies when online."} History stays in this browser and may be visible to anyone using this device. Avoid names, phone numbers and identifying medical details.</p>
     </section>
   );
 }
