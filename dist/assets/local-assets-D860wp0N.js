@@ -1,0 +1,1 @@
+function e(e,t){return`/offline-assets/${t}`}export{e as t};

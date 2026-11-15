@@ -1,0 +1,27 @@
+# Dependencies and build output for the source project
+source/node_modules/
+source/dist/
+source/dist-ssr/
+source/.output/
+source/.vinxi/
+source/.tanstack/
+source/.nitro/
+source/coverage/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+source/.env
+source/.env.*
+!source/.env.example
+
+# Logs and editor files
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
