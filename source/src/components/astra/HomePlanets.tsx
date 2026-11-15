@@ -6,14 +6,14 @@ import earth from "@/assets/home/earth.jpg.asset.json";
 import mars from "@/assets/home/mars.jpg.asset.json";
 import { assetUrl } from "@/lib/astra/local-assets";
 
-function SatelliteOrbit({ radius, phase, position, tilt, reducedMotion, colors }: {
+function SatelliteOrbit({ radius, phase, position, tilt, colors }: {
   radius: number; phase: number; position: [number, number, number]; tilt: number;
-  reducedMotion: boolean; colors: { line: string; body: string; panel: string };
+  colors: { line: string; body: string; panel: string };
 }) {
   const satellite = useRef<Group>(null);
   const angle = useRef(phase);
   useFrame((_, delta) => {
-    if (!reducedMotion) angle.current += Math.min(delta, 0.05) * 0.23;
+    angle.current += Math.min(delta, 0.05) * 0.23;
     if (satellite.current) {
       satellite.current.position.set(Math.cos(angle.current) * radius, Math.sin(angle.current) * radius, 0);
       satellite.current.rotation.z = angle.current + Math.PI / 2;
@@ -36,7 +36,7 @@ function SatelliteOrbit({ radius, phase, position, tilt, reducedMotion, colors }
   </group>;
 }
 
-function Planets({ reducedMotion, ready, colors }: { reducedMotion: boolean; ready: () => void; colors: { line: string; body: string; panel: string } }) {
+function Planets({ ready, colors }: { ready: () => void; colors: { line: string; body: string; panel: string } }) {
   const earthMesh = useRef<Mesh>(null);
   const marsMesh = useRef<Mesh>(null);
   const signaled = useRef(false);
@@ -47,14 +47,13 @@ function Planets({ reducedMotion, ready, colors }: { reducedMotion: boolean; rea
   marsMap.colorSpace = SRGBColorSpace;
   useFrame((_, delta) => {
     if (!signaled.current) { signaled.current = true; ready(); }
-    if (reducedMotion) return;
     const dt = Math.min(delta, 0.05);
     if (earthMesh.current) earthMesh.current.rotation.y += dt * 0.13;
     if (marsMesh.current) marsMesh.current.rotation.y += dt * 0.1;
   });
   return <group scale={scale}>
-    <SatelliteOrbit radius={1.57} phase={Math.PI} position={[-0.8, 0.55, 0]} tilt={0.65} reducedMotion={reducedMotion} colors={colors} />
-    <SatelliteOrbit radius={1.16} phase={0} position={[1.12, -0.77, 0.6]} tilt={-0.55} reducedMotion={reducedMotion} colors={colors} />
+    <SatelliteOrbit radius={1.57} phase={Math.PI} position={[-0.8, 0.55, 0]} tilt={0.65} colors={colors} />
+    <SatelliteOrbit radius={1.16} phase={0} position={[1.12, -0.77, 0.6]} tilt={-0.55} colors={colors} />
     <mesh ref={earthMesh} position={[-0.8, 0.55, 0]} rotation={[0.12, 2.8, 0.18]}>
       <sphereGeometry args={[1.24, 64, 48]} />
       <meshStandardMaterial map={earthMap} roughness={0.78} />
@@ -68,7 +67,6 @@ function Planets({ reducedMotion, ready, colors }: { reducedMotion: boolean; rea
 
 export default function HomePlanets() {
   const [ready, setReady] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
   const [colors, setColors] = useState<{ line: string; body: string; panel: string }>();
   useEffect(() => {
     const style = getComputedStyle(document.documentElement);
@@ -84,11 +82,6 @@ export default function HomePlanets() {
       };
       setColors({ line: resolve("--primary"), body: resolve("--foreground"), panel: resolve("--secondary") });
     }
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReducedMotion(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
   }, []);
   return <div className="home-planets" role="img" aria-label="Rotating 3D Earth and Mars with two orbiting satellites" data-scene-ready={ready ? "true" : undefined}>
     <Canvas camera={{ position: [0, 0, 7], fov: 42 }} dpr={[1, 1.5]} gl={{ alpha: true, antialias: true }}>
@@ -98,7 +91,7 @@ export default function HomePlanets() {
         <Lightformer intensity={0.6} position={[0, 4, 3]} scale={[8, 8, 1]} />
       </Environment>
       <Suspense fallback={null}>
-        {colors && <Planets reducedMotion={reducedMotion} ready={() => setReady(true)} colors={colors} />}
+        {colors && <Planets ready={() => setReady(true)} colors={colors} />}
       </Suspense>
     </Canvas>
     <div className="home-planet-labels font-mono text-xs text-muted-foreground" aria-hidden><span>EARTH / HOME</span><span>MARS / HORIZON</span></div>
